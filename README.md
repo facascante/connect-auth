@@ -56,7 +56,7 @@ Errors in the API have an error object in the response
 #### Resources
 | Resource                                  | Description     | Status | Notes | 
 | ------------------------------------------| -----------| ------| --------|
-| **[<code>POST</code> api/v1/users/register (https://github.com/facascante/connect-auth/blob/master/docs/endpoint/register.md)**| Registration|||
+| **[<code>POST</code> api/v1/users/register(https://github.com/facascante/connect-auth/blob/master/docs/endpoint/register.md)**| Registration|||
 
 
 
