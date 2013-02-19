@@ -56,7 +56,7 @@ Errors in the API have an error object in the response
 #### Resources
 | Resource                                  | Description     | Status | Notes | 
 | ------------------------------------------| -----------| ------| --------|
-| Registration - **[<code>POST</code> api/key/login](https://github.com/SmartCommunication/smartauth/blob/master/docs/endpoint/keys/key.md)**||||
+| **[<code>POST</code> api/key/login](https://github.com/SmartCommunication/smartauth/blob/master/docs/endpoint/keys/key.md)**| Registration|||
 
 
 
