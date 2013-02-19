@@ -29,7 +29,7 @@ Errors in the API have an error object in the response
 {
   "error": [
     {
-         "code": <error code>
+         "code": <error code>,
          "message": <error message>,
          "param" : <field that cause error>,
          "value" : <submitted value>
@@ -41,10 +41,10 @@ Errors in the API have an error object in the response
 ```
 
 - For other errors
-```
+```json
 {
   "error": {
-       "code": <error code>
+       "code": <error code>,
        "message": <error message>
    },
    ...
