@@ -27,8 +27,8 @@ Errors in the API have an error object in the response
 - For validation errors with specific field mapping
 ```json
 {
-  "error": {
-    <parameter>: {
+  "error": [
+    {
          "code": <error code>
          "message": <error message>,
          "param" : <field that cause error>,
@@ -36,7 +36,7 @@ Errors in the API have an error object in the response
     },
     ...
     
-  },
+  ],
 }
 ```
 
