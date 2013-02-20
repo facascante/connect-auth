@@ -1,7 +1,7 @@
 # **<code>POST</code> api/v1/users/snlink**
 
 ## Description
-Register new account information.
+Register new account information via social network.
 
 ## Parameters
 
