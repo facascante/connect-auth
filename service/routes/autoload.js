@@ -8,6 +8,18 @@ module.exports = {
 	register : function(req,res){
 		var instance = version[req.params.version];
 		execute(instance, res, instance.routes.register(req,res));
+	},
+	search : function(req,res){
+		var instance = version[req.params.version];
+		execute(instance, res, instance.routes.search(req,res));
+	},
+	update : function(req,res){
+		var instance = version[req.params.version];
+		execute(instance, res, instance.routes.update(req,res));
+	},
+	login : function(req,res){
+		var instance = version[req.params.version];
+		execute(instance, res, instance.routes.login(req,res));
 	}
 
 };
