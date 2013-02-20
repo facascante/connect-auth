@@ -37,7 +37,7 @@ Content-Type: application/json
 
 ``` json
 {
-  "success" : "ok"
+  "s" : "<s-key>"
 }
 ``` 
 
