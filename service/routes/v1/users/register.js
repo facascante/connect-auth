@@ -38,6 +38,18 @@ module.exports = function(req,res){
 			internal_dberror : {
 				code : "DBFAILURE",
 				message: "Unable to save record",
+			},
+			duplicate_email : {
+				code : "DUP_MIN",
+				message : "Duplicate email address",
+				param : "email",
+				value : req.body.email
+			},
+			duplicate_mobile : {
+				code : "DUP_MIN",
+				message : "Duplicate Mobile Number",
+				param : "mobile",
+				value : req.body.mobile
 			}
 	};
 	console.log(req.body);
@@ -56,10 +68,30 @@ module.exports = function(req,res){
 	else{
 		
 		async.auto({
-			 validation: function(callback){
+			 validate_puk: function(callback){
 				 var content = {},condition = {};
 				 condition.mobile = req.body.mobile;
 				 condition.puk1 = req.body.puk1;
+				 content.collection = 'puklist';
+			     content.query = condition;
+			     content.columns = {};
+			     content.sorting = {};
+			     
+			     req.model.read(content,function(err,data){
+			        	if(err){
+			        		callback(ERROR.internal_dberror);
+			        	}
+			        	else if(data.length == 0){
+			        		callback(ERROR.puk1_unreg);
+			        	}
+			        	else{
+			        		callback(null,data);
+			        	}
+			     });
+			 },
+			 validate_duplicate: ['validate_puk', function(callback,result){
+				 var content = {};
+				 var condition = {"$or" : new Array({email:req.body.email},{mobile:req.body.mobile})};
 				 content.collection = 'users';
 			     content.query = condition;
 			     content.columns = {};
@@ -69,12 +101,20 @@ module.exports = function(req,res){
 			        	if(err){
 			        		callback(ERROR.puk1_unreg);
 			        	}
+			        	else if(data.length > 0){
+			        		if(data[0].mobile == req.body.mobile){
+			        			callback(ERROR.duplicate_mobile);
+			        		}
+			        		if(data[0].email == req.body.email){
+			        			callback(ERROR.duplicate_email);
+			        		}
+			        	}
 			        	else{
 			        		callback(null,data);
 			        	}
 			     });
-			 },
-			 creation: ['validation', function(callback,result){
+			 }],
+			 creation: ['validate_duplicate', function(callback,result){
 				 
 				 var content = {}, record = {};
 				 record.email = req.body.email;
