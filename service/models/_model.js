@@ -22,7 +22,8 @@ REMOVE:
 */
 
 var model = {
-    
+		
+	ObjectID : mongoq.mongodb.BSONPure.ObjectID,
     read : function(content,cb){
       db.collection(content.collection)
       .find(content.query,content.columns)
