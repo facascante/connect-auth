@@ -5,7 +5,6 @@ Register new account information.
 
 ## Parameters
 
-- **reg_type** [String] _(M)_ — Account registration type (SN - Social Network FB Registration, IA - In app Registration).
 - **email** [String] _(M)_ — Account valid email address.
 - **password** [String] _(M)_ — Account preferred password.
 - **min** [String] _(M)_ — Account valid mobile identification number.
@@ -31,7 +30,6 @@ Content-Type: application/json
 ```
 ``` json
 { 
-  "reg_type" : <reg_type>, 
   "email" : <email>, 
   "password" : <pasword>, 
   "min" : <min>, 
