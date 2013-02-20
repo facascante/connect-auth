@@ -1,5 +1,7 @@
 var async = require('async');
-var email = require('../../../../library/email.js');
+var crypto = require('crypto');
+var hash = require('../../../../library/passwordHash.js');
+var cryptography = require('../../../../library/cryptography.js');
 module.exports = function(req,res){
 	
 	var ERROR = {
@@ -15,28 +17,11 @@ module.exports = function(req,res){
 				param : "password",
 				value : req.body.password
 			},
-			min_invalid : {
-				code : "INV_MIN",
-				message : "Invalid or Missing mobile identification number",
-				param : "min",
-				value : req.body.min
-			},
-			puk1_invalid : {
-				code : "INV_PUK1",
-				message : "Invalid or Missing PUK 1",
-				param : "puk1",
-				value : req.body.puk1
-			},
-			puk1_unreg : {
-				code : "UNREG_PUK1",
-				message : "Unregistered PUK 1",
-				param : "puk1",
-				value : req.body.puk1
-			},
 			internal_dberror : {
 				code : "DBFAILURE",
-				message: "Unable to save record",
-			}
+				message: "Unable to get record",
+			},
+			
 	};
 	console.log(req.body);
 	if(typeof req.body.email == 'undefined' || !validateEmail(req.body.email)){
@@ -45,19 +30,14 @@ module.exports = function(req,res){
 	else if(typeof req.body.password == 'undefined' || !req.body.password.length >=6){
 		res.json(400,ERROR.password_invalid);
 	}
-	else if(typeof req.body.min == 'undefined' || !req.body.min.length >=10){
-		res.json(400,ERROR.min_invalid);
-	}
-	else if(typeof req.body.puk1 == 'undefined' || !req.body.puk1.length >=5){
-		res.json(400,ERROR.puk1_invalid);
-	}
 	else{
 		
 		async.auto({
-			 validation: function(callback){
-				 var content = {},condition = {};
-				 condition.min = req.body.min;
-				 condition.puk1 = req.body.puk1;
+			 
+			 getProfile:  function(callback,result){
+				 
+				 var content = {};
+				 var condition = {email:req.body.email};
 				 content.collection = 'users';
 			     content.query = condition;
 			     content.columns = {};
@@ -65,37 +45,40 @@ module.exports = function(req,res){
 			     
 			     req.model.read(content,function(err,data){
 			        	if(err){
-			        		callback(ERROR.puk1_unreg);
+			        		callback(ERROR.internal_dberror);
+			        	}
+			        	else if(data.length == 1){
+			        		callback(null,data[0]);
 			        	}
 			        	else{
-			        		callback(null,data);
+			        		callback(ERROR.email_invalid);
 			        	}
 			     });
 			 },
-			 creation: ['validation', function(callback,result){
-				 
-				 var content = {}, record = {};
-				 record.email = req.body.email;
-				 record.password = req.body.password;
-				 record.min = req.body.min;
-				 record.puk1 = req.body.puk1;
-			     content.collection = 'users';
-			     content.record = record;
-			     req.model.create(content,function(err,data){
-			    	 if(err){
-			    		 callback(ERROR.internal_dberror);
-			    	 }
-			    	 else{
-			    		 callback(null,data);
-			    	 }
-			     });
+			 authenticate: ['getProfile', function(callback,result){
+				
+				 var input_password = hash.generatePassword(result.getProfile.salt,req.body.password);
+				 if(input_password != result.getProfile.password){
+					 callback(ERROR.password_invalid);
+				 }
+				 else{
+					 callback(null,true);
+				 }
 			 }],
-			 email: ['creation', function(callback,result){
-				 var subject = "Welcome to Connect "+ req.body.first_name;
-		         var message = "<b>Hi</b>";
-		         email.Send(req.body.email,subject,message,function(error,callback){
-		         });
-		         callback(null,true);
+			 generateKey: ['authenticate', function(callback,result){
+				
+				 var user = result.getProfile;
+				  
+			        var raw_skey = {};
+			        raw_skey.ver = 'v1';
+			  
+			        raw_skey.user_id = user._id;
+			        raw_skey.username = user.email;
+			        raw_skey.issued_at = new Date().getTime();
+			        raw_skey.expire_at = new Date().getTime() + 2592000000;
+			        var skey = cryptography.generateKey(raw_skey);
+			        var key = {s:skey};
+			        callback(null,key);
 			 }]
 			
 		},function(error, response){
@@ -103,7 +86,7 @@ module.exports = function(req,res){
 				res.json(400,error);
 			}
 			else{
-				res.json(200,{"success" : "ok"});
+				res.json(200,response.generateKey);
 			}
 		});
 	}

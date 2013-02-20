@@ -1,7 +1,8 @@
 	var fs = require('fs'),
 		 crypto = require('crypto'),
          path = require('path'),
-         config = require('../config/global.js');
+         config = require('../config/global.js'),
+	     private_key = fs.readFileSync(config.PRIVATE_KEY, 'ascii');
 
 	exports.generateKey = function(raw_key){
 	  
