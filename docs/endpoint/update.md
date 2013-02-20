@@ -1,4 +1,4 @@
-# **<code>PUT</code> api/v1/users/update**
+# **<code>PUT</code> api/v1/users/:id**
 
 ## Description
 Update profile information.
@@ -25,7 +25,7 @@ Update profile information.
 **Request**
 
 ```
-POST api/v1/users/update HTTP/1.1
+PUT api/v1/users/:id HTTP/1.1
 Content-Type: application/json
 ```
 ``` json
