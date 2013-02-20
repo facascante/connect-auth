@@ -1,7 +1,7 @@
 # **<code>POST</code> api/v1/users/snlogin**
 
 ## Description
-Authenticate user
+Authenticate user via facebook
 
 ## Parameters
 
