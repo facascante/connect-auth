@@ -48,3 +48,6 @@ Content-Type: application/json
 ## Implementation notes
 
 - puk1 reference is not yet clear and might change to pin but still subject for clarification
+- mobile number is unique
+- email address is unique
+- puk1 should exist in puk list and should match with mobile number
