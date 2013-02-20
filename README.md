@@ -60,4 +60,4 @@ Errors in the API have an error object in the response
 | **[<code>POST</code> api/v1/users/login](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/login.md)**| Login| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
 | **[<code>GET</code> api/v1/users/:id](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/search.md)**| Get Profile| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
 | **[<code>POST</code> api/v1/users/snlink](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/snlink.md)**| Get Profile| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
-| **[<code>GET</code> api/v1/users/snlogin](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/snlogin.md)**| Get Profile| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
+| **[<code>POST</code> api/v1/users/snlogin](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/snlogin.md)**| Get Profile| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
