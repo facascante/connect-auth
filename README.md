@@ -57,6 +57,6 @@ Errors in the API have an error object in the response
 | Resource                                  | Description     | Status | Notes | 
 | ------------------------------------------| -----------| ------| --------|
 | **[<code>POST</code> api/v1/users/register](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/register.md)**| Registration| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | PUK DB are just an assumption|
-
+| **[<code>POST</code> api/v1/users/login](https://github.com/facascante/connect-auth/blob/master/docs/endpoint/login.md)**| Login| Dev - 100 % <br/>SIT - 100 % <br/>SAT - 0 %<br/>UAT - 0 % | |
 
 
