@@ -20,6 +20,14 @@ module.exports = {
 	login : function(req,res){
 		var instance = version[req.params.version];
 		execute(instance, res, instance.routes.login(req,res));
+	},
+	snlink : function(req,res){
+		var instance = version[req.params.version];
+		execute(instance, res, instance.routes.snlink(req,res));
+	},
+	snlogin : function(req,res){
+		var instance = version[req.params.version];
+		execute(instance, res, instance.routes.snlogin(req,res));
 	}
 
 };
