@@ -8,8 +8,7 @@ var express = require('express')
   , path = require('path')
   , config = require('./config/local.js')
   , model = require('./models/_model.js')
-  , expressValidator = require('express-validator')
-  , cryptography = require('../library/cryptography.js');
+  , expressValidator = require('express-validator');
 
 var app = module.exports = express();
 
@@ -29,26 +28,6 @@ app.configure(function(){
   
 });
 
-
-function restrict(req, res, next) {
-	if (req.headers.s) {
-		var raw_skey = cryptography.verifyKey(req.headers.s);
-		if(raw_skey){
-			if(req.params.user_id == "me"){
-				req.params.user_id = raw_skey.user_id;
-				req.raw_skey = raw_skey;
-				console.log(raw_skey);
-			}
-			next();
-		}
-		else {
-			next(new Error('403'));
-		}
-	} 
-	else {
-		next(new Error('403'));
-	}
-}
 
 function errorHandler(options) {
   return function errorHandler(err, req, res, next) {
