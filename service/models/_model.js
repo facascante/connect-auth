@@ -1,74 +1,64 @@
-var mongoq = require('mongoq');
-config = require('../config/local.js');
+var mysql = require('mysql');
+var pool  = mysql.createPool({
+	  host     : 'localhost',
+	  user     : 'connect_auth',
+	  password : 'connect_auth',
+	  database : 'connect_auth'
+});
 
-var db = mongoq(config.MONGO_URL);
-
-/*
-ALL:
-- collection
-READ:
-- query
-- columns
-- sorting
-- page
-- rows
-CREATE:
-- record
-UPDATE:
-- query
-- record
-REMOVE:
-- query
-*/
+var ERROR = {
+		db_unavailable : {
+			code : "DB_UNA",
+			message : "Unable to connect to Mysql DB",
+			param : "database"
+		},
+		db_execute_failed : {
+			code : "DB_EXF",
+			message : "Unable to save record",
+			param : "database"
+		}
+};
 
 var model = {
-		
-	ObjectID : mongoq.mongodb.BSONPure.ObjectID,
-    read : function(content,cb){
-      db.collection(content.collection)
-      .find(content.query,content.columns)
-      .sort(content.sorting).skip(content.page || 0)
-      .limit(content.rows || 0).toArray()
-      .done(function(result){   
-          cb(null,result);
-      })
-      .fail( function( err ) { 
-          cb(err);
-      });    
-
-    },
-    create : function(content,cb){
-      db.collection(content.collection)
-      .insert(content.record, {safe: true})
-      .done(function(result){   
-        cb(null,result);
-      })
-      .fail( function( err ) { 
-        cb(err);
-      });    
-    },
-    update : function(content,cb){
-        db.collection(content.collection)
-        .update(content.query, content.record, {safe: true})
-        .done(function(result){   
-            cb(null,result);
-        })
-        .fail( function( err ) { 
-            cb(err);
-        });   
-    },
-    remove : function(content,cb){
-        db.collection(content.collection)
-        .remove(content.query, {safe: true})
-        .done(function(result){   
-            cb(null,result);
-        })
-        .fail( function( err ) { 
-            cb(err);
-        });
-    }
-    
+	insert : function(content,cb){
+		pool.getConnection(function(err, connection) {
+			if(err){
+				cb({code:503,msg:ERROR.db_unavailable});
+			}
+			else{
+				connection.query("INSERT INTO "+content.table+" SET ?",content.record,function(err,result){
+					if(err){
+						console.log(err);
+						cb({code:503,msg:ERROR.db_execute_failed});
+					}
+					else{
+						cb(null,result);
+					}
+				});
+			}
+		});
+	},
+	read : function(content,cb){
+		pool.getConnection(function(err, connection) {
+			if(err){
+				cb({code:503,msg:ERROR.db_unavailable});
+			}
+			else{
+				connection.query("SELECT * FROM "+content.table+" WHERE ?",content.condition,function(err,result){
+					if(err){
+						console.log(err);
+						cb({code:503,msg:ERROR.db_execute_failed});
+					}
+					else{
+						cb(null,result);
+					}
+				});
+			}
+		});
+	},
+	
 };
+
 module.exports = function(req,res,next){
 
 	req.model = model;

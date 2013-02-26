@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+		<title>register</title>
+    <link rel="stylesheet" href="/Users/chito/.config/md/themes/default/css/html.css" type="text/css" charset="utf-8">
+	</head>
+	<body>
+		<div id="content">
+			<h1 id="codepostcode-apiv1usersregister"><strong><code>POST</code> api/v1/users/register</strong></h1>
+
+<h2 id="description">Description</h2>
+<p>Register new account information.</p>
+
+<h2 id="parameters">Parameters</h2>
+
+<ul>
+  <li><strong>email</strong> [String] <em>(M)</em> — Account valid email address.</li>
+  <li><strong>password</strong> [String] <em>(M)</em> — Account preferred password.</li>
+  <li><strong>min</strong> [String] <em>(M)</em> — Account valid mobile identification number.</li>
+  <li><strong>puk1</strong> [String] <em>(M)</em> — Account valid puk 1 number.</li>
+</ul>
+
+<h2 id="response">Response</h2>
+
+<ul>
+  <li><strong>success</strong></li>
+</ul>
+
+<h2 id="errors">Errors</h2>
+
+<ul>
+  <li><strong>400</strong>:Invalid or Missing Parameter</li>
+  <li><strong>408</strong>:Request timeout</li>
+  <li><strong>503</strong>: Service Unavailable</li>
+</ul>
+
+<h2 id="example">Example</h2>
+
+<p><strong>Request</strong></p>
+
+<p><code>
+POST api/v1/users/register HTTP/1.1
+Content-Type: application/json
+</code>
+<code>json
+{ 
+  "email" : &lt;email&gt;, 
+  "password" : &lt;pasword&gt;, 
+  "min" : &lt;min&gt;, 
+  "puk1" : &lt;puk1&gt;
+}
+</code> </p>
+
+<p><strong>Return</strong></p>
+
+<p><code>json
+{
+  "success" : "ok"
+}
+</code> </p>
+
+<h2 id="implementation-notes">Implementation notes</h2>
+
+<ul>
+  <li>puk1 reference is not yet clear and might change to pin but still subject for clarification</li>
+  <li>mobile number is unique</li>
+  <li>email address is unique</li>
+  <li>puk1 should exist in puk list and should match with mobile number</li>
+</ul>
+
+		</div>
+	</body>
+</html>

@@ -1,9 +1,14 @@
 var async = require('async');
-var crypto = require('crypto');
 var hash = require('../../../../library/passwordHash.js');
-var cryptography = require('../../../../library/cryptography.js');
+var crypto = require('crypto');
+var fbgraph = require('fbgraph');
+var fboptions = {
+    timeout:  30000
+  , pool:     { maxSockets:  Infinity }
+  , headers:  { connection:  "keep-alive" }
+};
 module.exports = function(req,res){
-	
+
 	var ERROR = {
 			email_invalid : {
 				code : "INV_EMAI",
@@ -17,80 +22,106 @@ module.exports = function(req,res){
 				param : "password",
 				value : req.body.password
 			},
-			internal_dberror : {
-				code : "DBFAILURE",
-				message: "Unable to get record",
+			token_invalid : {
+				code : "INV_TOKE",
+				message : "Invalid or Missing token",
+				param : "token",
+				value : req.body.token
 			},
-			
+			token_unauth : {
+				code : "UNA_TOKE",
+				message : "Unauthorize token",
+				param : "token",
+				value : req.body.token
+			}
 	};
-	console.log(req.body);
-	if(typeof req.body.email == 'undefined' || !validateEmail(req.body.email)){
-		res.json(400,ERROR.email_invalid);
-	}
-	else if(typeof req.body.password == 'undefined' || !req.body.password.length >=6){
-		res.json(400,ERROR.password_invalid);
-	}
-	else{
-		
-		async.auto({
-			 
-			 getProfile:  function(callback,result){
-				 
-				 var content = {};
-				 var condition = {email:req.body.email};
-				 content.collection = 'users';
-			     content.query = condition;
-			     content.columns = {};
-			     content.sorting = {};
-			     
-			     req.model.read(content,function(err,data){
-			        	if(err){
-			        		callback(ERROR.internal_dberror);
-			        	}
-			        	else if(data.length == 1){
-			        		callback(null,data[0]);
-			        	}
-			        	else{
-			        		callback(ERROR.email_invalid);
-			        	}
-			     });
-			 },
-			 authenticate: ['getProfile', function(callback,result){
-				
-				 var input_password = hash.generatePassword(result.getProfile.salt,req.body.password);
-				 if(input_password != result.getProfile.password){
-					 callback(ERROR.password_invalid);
-				 }
-				 else{
-					 callback(null,true);
-				 }
-			 }],
-			 generateKey: ['authenticate', function(callback,result){
-				
-				 var user = result.getProfile;
-				  
-			        var raw_skey = {};
-			        raw_skey.ver = 'v1';
-			  
-			        raw_skey.user_id = user._id;
-			        raw_skey.username = user.email;
-			        raw_skey.issued_at = new Date().getTime();
-			        raw_skey.expire_at = new Date().getTime() + 2592000000;
-			        var skey = cryptography.generateKey(raw_skey);
-			        var key = {s:skey};
-			        callback(null,key);
-			 }]
+	
+	async.auto({
+
+		validate : function(callback){
 			
-		},function(error, response){
-			if(error){
-				res.json(400,error);
+			if(!req.body.token){
+				if(typeof req.body.email == 'undefined' || !validateEmail(req.body.email)){
+					callback({code:400,msg:ERROR.email_invalid});
+				}
+				else if(typeof req.body.password == 'undefined'){
+					callback({code:400,msg:ERROR.password_invalid});
+				}
+				else{
+					callback(null,true);
+				}
+				
 			}
 			else{
-				res.json(200,response.generateKey);
+				try{
+				 fbgraph.setAccessToken(req.body.token);
+			     fbgraph.setOptions(fboptions).get("me", function(err, fbres) {
+			    	 console.log(err);
+			    	  if (fbres.error) {
+				          callback({code:400,msg:ERROR.token_unauth});
+				      }
+				      else {
+				    	req.body.email = fbres.email;
+				    	if(typeof req.body.email == 'undefined' || !validateEmail(req.body.email)){
+							callback({code:400,msg:ERROR.email_invalid});
+						}
+				    	else{
+				    		callback(null,true);
+				    	}
+				      }
+			     });
+				}
+				catch(e){
+					console.log(e);
+				}
 			}
-		});
-	}
-	
+			
+		},
+		authenticate : [ 'validate', function(callback){
+			
+			var condition = {};
+			condition.email = req.body.email;
+			var content = {};
+			content.table = "users_profile";
+			content.condition = condition;
+			console.log(content);
+			req.model.read(content,function(error,response){
+				console.log(response);
+				if(error || response.length == 0){
+					callback(error);
+				}
+				else{
+					if(!req.body.token){
+						password = hash.generatePassword(response[0].salt,req.body.password);
+						console.log(password);
+						console.log(response[0].password);
+						if(password != response[0].password){
+							callback({code:400,msg:ERROR.password_invalid});
+						}
+						else{
+							delete response[0].salt;
+							delete response[0].password;
+							callback(null,response[0]);
+						}
+					}
+					else{
+						delete response[0].salt;
+						delete response[0].password;
+						callback(null,response[0]);
+					}
+				}
+			});
+			
+		}]
+	},
+	function(error,result){
+		if(error){
+			res.json(error.code,error.msg);
+		}
+		else{
+			res.json(200,result.authenticate);
+		}
+	});
 };
 
 function validateEmail(email) { 

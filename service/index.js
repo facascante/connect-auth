@@ -66,9 +66,9 @@ app.configure(function(){
 });
 
 app.post('/api/:version/users/register', router.register);
-app.get('/api/:version/users/:id', router.search);
 app.post('/api/:version/users/login', router.login);
-app.post('/api/:version/users/snlink', router.snlink);
-app.post('/api/:version/users/snlogin', router.snlogin);
+
+
+
 
 
